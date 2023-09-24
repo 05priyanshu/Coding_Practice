@@ -6,10 +6,9 @@ using namespace std;
 class Solution{
   public:
     vector<int> duplicates(int arr[], int n) {
-        // set<int> ans;
         unordered_map<int,int> hash;
         vector <int>anss;
-        // set<int>::iterator itr;
+        
         int i;
         for(i=0;i<n;i++){
             hash[arr[i]]++;
@@ -21,9 +20,7 @@ class Solution{
                 
             }
         }
-        // for (itr = ans.begin();itr != ans.end(); itr++){
-        //     anss.push_back(*itr);
-        // }
+        
         if(!anss.empty()) {
             sort(anss.begin(),anss.end());
             return anss;
