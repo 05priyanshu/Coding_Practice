@@ -16,20 +16,25 @@ class Solution
     {
         int r = matrix.size();
         int c = matrix[0].size();
-        vector <vector<int>> temp = matrix;
+        // vector <vector<int>> temp = matrix;
+        vector <int> row(r,0);
+        vector <int> col(c,0);
+        
         for(int i =0;i<r;i++){
             for(int j =0;j<c;j++){
-                if(temp[i][j]== 1){
-                    for(int k=0;k<r;k++){
-                        matrix[k][j]=1;
-                    }
-                    for(int k=0;k<c;k++){
-                        matrix[i][k]=1;
-                    }
+                if(matrix[i][j]==1){
+                    row[i] =1;
+                    col[j]=1;
+                }
+            }  
+        }
+        for(int i=0;i<r;i++){
+            for(int j =0;j<c;j++){
+                if(row[i]==1 || col[j]==1){
+                    matrix[i][j]=1;
                 }
             }
         }
-        // code here 
     }
 };
 
