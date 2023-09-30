@@ -24,7 +24,7 @@ public:
                 bad++;
             }
         }
-        int i=1,j=good, ans=bad;
+        int i=0,j=good, ans=bad;
         while(j<n){
             if(arr[i]>k){
                 bad--;
