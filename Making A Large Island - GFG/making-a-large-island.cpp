@@ -4,60 +4,110 @@ using namespace std;
 
 // } Driver Code Ends
 //User function Template for C++
-class Solution {
-    int dfs(int i,int j,vector<vector<int>>& grid,vector<vector<int>>& visited,int vkey) {
-        if (i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size()) return 0;
-        if (grid[i][j] == 0 || visited[i][j] != 0) return 0;
-        visited[i][j] = vkey;
-        
-        return 1 + dfs(i+1,j,grid,visited,vkey)
-            + dfs(i-1,j,grid,visited,vkey)
-            + dfs(i,j+1,grid,visited,vkey)
-            + dfs(i,j-1,grid,visited,vkey);
+class DisjointSet {
+
+public:
+    vector<int> rank, parent, size;
+    DisjointSet(int n) {
+        rank.resize(n + 1, 0);
+        parent.resize(n + 1);
+        size.resize(n + 1);
+        for (int i = 0; i <= n; i++) {
+            parent[i] = i;
+            size[i] = 1;
+        }
     }
-    
-    void fill(int i,int j,vector<vector<int>>& grid,int f) {
-        if (i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size()) return;
-        if (grid[i][j] != 1) return;
-        
-        grid[i][j] = f;
-        fill(i+1,j,grid,f);
-        fill(i-1,j,grid,f);
-        fill(i,j+1,grid,f);
-        fill(i,j-1,grid,f);
+
+    int findUPar(int node) {
+        if (node == parent[node])
+            return node;
+        return parent[node] = findUPar(parent[node]);
+    }
+
+    void unionByRank(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (rank[ulp_u] < rank[ulp_v]) {
+            parent[ulp_u] = ulp_v;
+        }
+        else if (rank[ulp_v] < rank[ulp_u]) {
+            parent[ulp_v] = ulp_u;
+        }
+        else {
+            parent[ulp_v] = ulp_u;
+            rank[ulp_u]++;
+        }
+    }
+
+    void unionBySize(int u, int v) {
+        int ulp_u = findUPar(u);
+        int ulp_v = findUPar(v);
+        if (ulp_u == ulp_v) return;
+        if (size[ulp_u] < size[ulp_v]) {
+            parent[ulp_u] = ulp_v;
+            size[ulp_v] += size[ulp_u];
+        }
+        else {
+            parent[ulp_v] = ulp_u;
+            size[ulp_u] += size[ulp_v];
+        }
+    }
+};
+class Solution {
+private:
+    bool isValid(int newr, int newc, int n) {
+        return newr >= 0 && newr < n && newc >= 0 && newc < n;
     }
 public:
     int largestIsland(vector<vector<int>>& grid) {
-        int ans = -1,temp;
-        vector<vector<int>> visited(grid.size(),vector<int>(grid[0].size(),0));
-        int vkey = 1;
-        
-        for (int i=0;i<grid.size();i++) {
-            for (int j=0;j<grid[0].size();j++) {
-                if (grid[i][j] == 1) {
-                    temp = dfs(i,j,grid,visited,vkey++);
-                    fill(i,j,grid,temp);
+        int n = grid.size();
+        DisjointSet ds(n * n);
+        // step - 1
+        for (int row = 0; row < n ; row++) {
+            for (int col = 0; col < n ; col++) {
+                if (grid[row][col] == 0) continue;
+                int dr[] = { -1, 0, 1, 0};
+                int dc[] = {0, -1, 0, 1};
+                for (int ind = 0; ind < 4; ind++) {
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if (isValid(newr, newc, n) && grid[newr][newc] == 1) {
+                        int nodeNo = row * n + col;
+                        int adjNodeNo = newr * n + newc;
+                        ds.unionBySize(nodeNo, adjNodeNo);
+                    }
                 }
             }
         }
-        
-        for (int i=0;i<grid.size();i++) {
-            for (int j=0;j<grid[0].size();j++) {
-                if (grid[i][j] == 0) {
-                    temp = 1;
-                    int v1=0,v2=0,v3=0;
-                    if (i+1<grid.size()) {temp += grid[i+1][j];v1=visited[i+1][j];}
-                    if (i-1<grid.size() && v1 != visited[i-1][j]) {temp += grid[i-1][j];v2=visited[i-1][j];}
-                    if (j+1<grid[0].size() && v1 != visited[i][j+1] && v2 != visited[i][j+1]) {temp += grid[i][j+1];v3=visited[i][j+1];}
-                    if (j-1<grid[0].size() && v1 != visited[i][j-1] && v2 != visited[i][j-1] && v3 != visited[i][j-1]) temp += grid[i][j-1];
-                    
-                    ans = max(ans,temp);
+        // step 2
+        int mx = 0;
+        for (int row = 0; row < n; row++) {
+            for (int col = 0; col < n; col++) {
+                if (grid[row][col] == 1) continue;
+                int dr[] = { -1, 0, 1, 0};
+                int dc[] = {0, -1, 0, 1};
+                set<int> components;
+                for (int ind = 0; ind < 4; ind++) {
+                    int newr = row + dr[ind];
+                    int newc = col + dc[ind];
+                    if (isValid(newr, newc, n)) {
+                        if (grid[newr][newc] == 1) {
+                            components.insert(ds.findUPar(newr * n + newc));
+                        }
+                    }
                 }
+                int sizeTotal = 0;
+                for (auto it : components) {
+                    sizeTotal += ds.size[it];
+                }
+                mx = max(mx, sizeTotal + 1);
             }
         }
-        
-        if (ans == -1) return grid.size()*grid[0].size();
-        return ans;
+        for (int cellNo = 0; cellNo < n * n; cellNo++) {
+            mx = max(mx, ds.size[ds.findUPar(cellNo)]);
+        }
+        return mx;
     }
 };
 
