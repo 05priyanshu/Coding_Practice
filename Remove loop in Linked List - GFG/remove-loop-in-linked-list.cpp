@@ -88,73 +88,55 @@ struct Node
 class Solution
 {
 public:
-    Node* floydDetectLoop(Node* head) {
-
-    if(head == NULL)
+    Node* detectLoop(Node* head)
+    {
+        Node* slow = head;
+        Node* fast = head;
+        while (fast != NULL && fast->next != NULL)
+        {
+            fast = fast->next->next;
+            slow = slow->next;
+            if (slow == fast)
+            {
+                return slow;
+            }
+        }
         return NULL;
-
-    Node* slow = head;
-    Node* fast = head;
-
-    while(slow != NULL && fast !=NULL) {
-        
-        fast = fast -> next;
-        if(fast != NULL) {
-            fast = fast -> next;
-        }
-
-        slow = slow -> next;
-
-        if(slow == fast) {
-            return slow;
-        }
     }
 
-    return NULL;
+    // Function to remove a loop in the linked list.
+    void removeLoop(Node* head)
+    {
+        Node* meet = detectLoop(head);
 
-}
+        if (meet == NULL)
+        {
+            // No loop detected, nothing to remove
+            return;
+        }
 
-Node* getStartingNode(Node* head) {
+        Node* start = head;
+        Node* pre = head;
+        
+        if (start == meet) {
+            
+            Node* tmp = head;
+            while (tmp -> next != meet) tmp = tmp -> next;
+            tmp -> next = NULL;
+            return;
+        }
 
-    if(head == NULL) 
-        return NULL;
-
-    Node* intersection = floydDetectLoop(head);
-    
-    if(intersection == NULL)
-        return NULL;
-    
-    Node* slow = head;
-
-    while(slow != intersection) {
-        slow = slow -> next;
-        intersection = intersection -> next;
-    }  
-
-    return slow;
-
-}
-
-Node *removeLoop(Node *head)
-{
-    if( head == NULL)
-        return NULL;
-
-    Node* startOfLoop = getStartingNode(head);
-    
-    if(startOfLoop == NULL)
-        return head;
-    
-    Node* temp = startOfLoop;
-
-    while(temp -> next != startOfLoop) {
-        temp = temp -> next;
-    } 
-
-    temp -> next = NULL;
-    return head;
-}
+        while (start != meet)
+        {
+            pre = meet;
+            meet = meet->next;
+            start = start->next;
+        }
+        pre->next = NULL;
+        
+    }
 };
+
 
 
 
