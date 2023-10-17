@@ -108,16 +108,13 @@ public:
     void removeLoop(Node* head)
     {
         Node* meet = detectLoop(head);
-
         if (meet == NULL)
         {
             // No loop detected, nothing to remove
             return;
         }
-
         Node* start = head;
         Node* pre = head;
-        
         if (start == meet) {
             
             Node* tmp = head;
@@ -133,7 +130,6 @@ public:
             start = start->next;
         }
         pre->next = NULL;
-        
     }
 };
 
