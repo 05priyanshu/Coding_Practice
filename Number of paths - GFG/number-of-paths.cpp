@@ -5,34 +5,32 @@ using namespace std;
 
 // } Driver Code Ends
 
-class Solution
-{
-    long long MOD = 1000000007;
-
+class Solution {
 public:
-    long long numberOfPaths(int M, int N) {
-        long long ans = 1;
+    int mod = 1000000007;
 
-        for (long long i = 1; i <= M - 1; i++) {
-            ans = (ans * (N + i - 1)) % MOD;
-            ans = (ans * modInverse(i)) % MOD;
+    long numberOfPaths(int M, int N) {
+        int n = M + N - 2;
+        int r = min(M - 1, N - 1);
+        long res = 1;
+
+        for (int i = 1; i <= r; i++) {
+            res = (res * (n - r + i) % mod * modInverse(i, mod)) % mod;
         }
-
-        return ans;
+        return res;
     }
 
-    // Function to calculate modular inverse using Fermat's Little Theorem
-    long long modInverse(long long a) {
-        long long result = 1;
-        long long b = MOD - 2; // Using Fermat's Little Theorem
-        while (b > 0) {
-            if (b % 2 == 1) {
-                result = (result * a) % MOD;
-            }
-            a = (a * a) % MOD;
-            b /= 2;
+    long modInverse(int a, int b) {
+        int x = 1, y = 0;
+        while (a > 1) {
+            int q = a / b, temp = b;
+            b = a % b;
+            a = temp;
+            temp = y;
+            y = x - q * y;
+            x = temp;
         }
-        return result;
+        return x < 0 ? x + mod : x;
     }
 };
 
