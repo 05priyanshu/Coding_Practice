@@ -9,9 +9,7 @@ class Solution
   public:
     int minOperation(int n)
     {
-        int count=0;
-        while(n!=0 && ++count) (n%2==0)?n=n/2:n=n-1; 
-        return count;
+        int count=0; while(n!=0 && ++count) (n%2==0)?n=n/2:n=n-1; return count;
     }
 };
 
